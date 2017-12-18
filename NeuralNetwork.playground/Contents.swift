@@ -28,11 +28,29 @@ class NeuralKit {
 
         return newArray
     }
+
+    // This function creates a new matrix with doubles between -0.5 and 0.5
+    func randomWeigts(nrOfInputNodes: Int, nrOfOutputNodes: Int) -> [[Double]]{
+        var newArray: [[Double]] = []
+        for _ in 0..<nrOfInputNodes {
+            var newRow: [Double] = []
+            for _ in 0..<nrOfOutputNodes+1 {
+                newRow.append(drand48() - 0.5)
+            }
+            newArray.append(newRow)
+        }
+        return newArray
+    }
 }
 
-var array = [[0.0,1.0],[1.0,2.0]]
 var network = NeuralKit()
-var sigmoided = network.sigmoid(array)
-print(sigmoided)
-var biased = network.addBias(sigmoided)
-print(biased)
+let newWeigths = network.randomWeigts(nrOfInputNodes: 2, nrOfOutputNodes: 5)
+print(newWeigths)
+
+//var array = [[0.0,1.0],[1.0,2.0]]
+
+//var sigmoided = network.sigmoid(array)
+//print(sigmoided)
+//var biased = network.addBias(sigmoided)
+//print(biased)
+
