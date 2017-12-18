@@ -3,12 +3,12 @@
 import UIKit
 
 class NeuralKit {
-    func sigmoid(X:[[Double]]) -> [[Double]]{
+    func sigmoid(_ X:[[Double]]) -> [[Double]]{
         var newArray: [[Double]] = []
 
-        for item in X {
+        for row in X {
             var newRow: [Double] = []
-            for col in item {
+            for col in row {
                 newRow.append(1/(1+exp(-col)))
             }
             newArray.append(newRow)
@@ -16,16 +16,23 @@ class NeuralKit {
         return newArray
     }
 
-//
-//    func addBias([[Double]]) -> [[Double]] {
-//
-//    }
+
+    func addBias(_ X: [[Double]]) -> [[Double]] {
+        var newArray: [[Double]] = []
+
+        for row in X {
+            var currentRow = row
+            currentRow.insert(1.0, at: 0)
+            newArray.append(currentRow)
+        }
+
+        return newArray
+    }
 }
 
-
-
-//var array = [[0.0,1.0],[1.0,2.0]]
-//var network = NeuralKit()
-//var sigmoided = network.sigmoid(X: array)
-//print(sigmoided)
-
+var array = [[0.0,1.0],[1.0,2.0]]
+var network = NeuralKit()
+var sigmoided = network.sigmoid(array)
+print(sigmoided)
+var biased = network.addBias(sigmoided)
+print(biased)
