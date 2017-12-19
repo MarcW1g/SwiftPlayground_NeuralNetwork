@@ -2,6 +2,28 @@
 
 import UIKit
 
+extension Array where Iterator.Element == Double {
+    static func *(left: [Double], right: [Double]) -> Double {
+        var product: Double = 0.0
+
+        for (i, key) in left.enumerated() {
+            product += key * right[i]
+        }
+
+        return product
+    }
+
+    static func *(value: Double, right: [Double]) -> Double {
+        var product: Double = 0.0
+
+        for key in right {
+            product += value * key
+        }
+
+        return product
+    }
+}
+
 class NeuralKit {
     func sigmoid(_ X:[[Double]]) -> [[Double]]{
         var newArray: [[Double]] = []
