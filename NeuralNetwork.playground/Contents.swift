@@ -25,7 +25,8 @@ extension Array where Iterator.Element == Double {
 }
 
 class NeuralKit {
-    func sigmoid(_ X:[[Double]]) -> [[Double]]{
+    // MARK: - Neural network
+    func sigmoid(_ X:[[Double]]) -> [[Double]] {
         var newArray: [[Double]] = []
 
         for row in X {
@@ -52,7 +53,7 @@ class NeuralKit {
     }
 
     // This function creates a new matrix with doubles between -0.5 and 0.5
-    func randomWeigts(nrOfInputNodes: Int, nrOfOutputNodes: Int) -> [[Double]]{
+    func randomWeigts(nrOfInputNodes: Int, nrOfOutputNodes: Int) -> [[Double]] {
         var newArray: [[Double]] = []
         for _ in 0..<nrOfInputNodes {
             var newRow: [Double] = []
@@ -63,16 +64,27 @@ class NeuralKit {
         }
         return newArray
     }
+
+    func computeLayer(activations: [[Double]], weights: [[Double]]) -> [[Double]]{
+        var newArray: [[Double]] = []
+
+        for a_row in activations {
+            var temp: [Double] = []
+            for w_row in weights {
+                temp.append(a_row * w_row)
+            }
+            newArray.append(temp)
+        }
+        return newArray
+    }
+
+    func oneLayerOut(X: [[Double]], weights: [[Double]]) -> [[Double]] {
+        let biasedX = addBias(X)
+        return self.sigmoid(computeLayer(activations: biasedX, weights: weights))
+    }
 }
 
 var network = NeuralKit()
-let newWeigths = network.randomWeigts(nrOfInputNodes: 2, nrOfOutputNodes: 5)
-print(newWeigths)
-
-//var array = [[0.0,1.0],[1.0,2.0]]
-
-//var sigmoided = network.sigmoid(array)
-//print(sigmoided)
-//var biased = network.addBias(sigmoided)
-//print(biased)
+network.oneLayerOut(X: [[1.0,2.0],[4.0,5.0],[7.0,8.0]], weights: [[0.1,0.1,0.2],[0.2,0.2,0.3]])
+//network.times(value: 2.0, right: [2.0,3.0])
 
