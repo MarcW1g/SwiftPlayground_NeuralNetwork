@@ -82,10 +82,30 @@ class NeuralKit {
         let biasedX = addBias(X)
         return self.sigmoid(computeLayer(activations: biasedX, weights: weights))
     }
+
+    func n_layerInit(size: [Int]) -> [[[Double]]] {
+        var weights: [[[Double]]] = []
+
+        for i in 0..<(size.count)-1 {
+            weights.append(randomWeigts(nrOfInputNodes: size[i], nrOfOutputNodes: size[i+1]))
+        }
+
+        return weights
+    }
+
+    func n_layerOutput(X: [[Double]], weights: [[[Double]]]) -> [[Double]] {
+        var retX = X
+
+        for weight in weights {
+            retX = oneLayerOut(X: retX, weights: weight)
+        }
+        return retX
+    }
 }
 
 var network = NeuralKit()
 network.oneLayerOut(X: [[1.0,2.0],[4.0,5.0],[7.0,8.0]], weights: [[0.1,0.1,0.2],[0.2,0.2,0.3]])
 //network.times(value: 2.0, right: [2.0,3.0])
+
 
 
