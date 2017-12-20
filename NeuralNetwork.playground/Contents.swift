@@ -55,9 +55,9 @@ class NeuralKit {
     // This function creates a new matrix with doubles between -0.5 and 0.5
     func randomWeigts(nrOfInputNodes: Int, nrOfOutputNodes: Int) -> [[Double]] {
         var newArray: [[Double]] = []
-        for _ in 0..<nrOfInputNodes {
+        for _ in 0..<nrOfOutputNodes {
             var newRow: [Double] = []
-            for _ in 0..<nrOfOutputNodes+1 {
+            for _ in 0..<nrOfInputNodes+1 {
                 newRow.append(drand48() - 0.5)
             }
             newArray.append(newRow)
@@ -87,4 +87,5 @@ class NeuralKit {
 var network = NeuralKit()
 network.oneLayerOut(X: [[1.0,2.0],[4.0,5.0],[7.0,8.0]], weights: [[0.1,0.1,0.2],[0.2,0.2,0.3]])
 //network.times(value: 2.0, right: [2.0,3.0])
+
 
