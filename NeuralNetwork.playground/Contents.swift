@@ -2,6 +2,7 @@
 
 import UIKit
 
+// MARK: - Array operations
 extension Array where Iterator.Element == Double {
     static func *(left: [Double], right: [Double]) -> Double {
         var product: Double = 0.0
@@ -26,6 +27,8 @@ extension Array where Iterator.Element == Double {
 
 class NeuralKit {
     // MARK: - Neural network
+
+    // MARK: - Basic setup functions
     func sigmoid(_ X:[[Double]]) -> [[Double]] {
         var newArray: [[Double]] = []
 
@@ -65,6 +68,8 @@ class NeuralKit {
         return newArray
     }
 
+    // MARK: - Functions to calculate the outputs for one layer
+
     func computeLayer(activations: [[Double]], weights: [[Double]]) -> [[Double]]{
         var newArray: [[Double]] = []
 
@@ -83,6 +88,7 @@ class NeuralKit {
         return self.sigmoid(computeLayer(activations: biasedX, weights: weights))
     }
 
+    // MARK: - Functions to calculate the output for multiple layers
     func n_layerInit(size: [Int]) -> [[[Double]]] {
         var weights: [[[Double]]] = []
 
@@ -100,6 +106,132 @@ class NeuralKit {
             retX = oneLayerOut(X: retX, weights: weight)
         }
         return retX
+    }
+
+    // MARK: - Cost Function
+    func costFunction(A: [[Double]], Y: [[Double]]) -> Double {
+        var cost = 0.0
+        for (i, y) in Y.enumerated() {
+            for (k, a) in A[i].enumerated() {
+                let yVal = y[k]
+                cost += (yVal * log(a)) + ((1-yVal) * log(1-a))
+            }
+        }
+        return -cost
+    }
+
+    // MARK: - Weight update function
+    func updateWeights(A: [[Double]], delta: [[Double]], weights: [[Double]], rate: Double) -> [[Double]] {
+        var newWeights: [[Double]] = []
+
+        for i in 0..<delta[0].count {
+
+            var gradient: [Double] = []
+            for _ in 0..<A[0].count {
+                gradient.append(0.0)
+            }
+
+            for (j, D) in delta.enumerated() {
+
+                var newGradient: [Double] = []
+                for item in A[j] {
+                    newGradient.append(item * D[i])
+                }
+
+                for (index, item) in gradient.enumerated() {
+                    gradient[index] = item + newGradient[index]
+                }
+            }
+
+            for (index, item) in gradient.enumerated() {
+                gradient[index] = item * rate
+            }
+
+            var currentWeight = weights[i]
+
+            if currentWeight.count == gradient.count {
+                for (index, item) in currentWeight.enumerated() {
+                    currentWeight[index] = item - gradient[index]
+                }
+            } else {
+                for (index, item) in currentWeight.enumerated() {
+                    currentWeight[index] = item - gradient[0]
+                }
+            }
+
+            newWeights.append(currentWeight)
+        }
+        return newWeights
+    }
+
+    // MARK: - Functions to calculate the delta's
+    func outputDelta(A: [[Double]], Y: [[Double]]) -> [[Double]] {
+        return A - Y
+    }
+
+    func hiddenLayer_delta(A: [[Double]], nextDelta: [[Double]], weights: [[Double]]) -> [[Double]] {
+
+        var delta_hidden: [[Double]] = []
+
+        for (i, A_row) in A.enumerated() {
+            var new_A_row = A_row
+            for (index, item) in A_row.enumerated() {
+                new_A_row[index] = (1-item)*item
+            }
+
+            let partTwo = LinearAlgebra().dotProduct(left: [nextDelta[i]], right: weights)
+            delta_hidden.append(LinearAlgebra().vectorTimes(left: new_A_row, right: partTwo[0]))
+        }
+
+        for (i, row) in delta_hidden.enumerated() {
+            var newRow = row
+            newRow.removeFirst()
+            delta_hidden[i] = newRow
+        }
+
+        return delta_hidden // return the new alpha but without the bias
+    }
+
+
+    //MARK: - The functions for training
+    func oneLayerTraining(data X: [[Double]], labels Y: [[Double]], weights: [[[Double]]], iterations iters: Int, learningRate rate: Double) -> [[Double]] {
+        var new_weights = weights[0]
+
+        var cost = 0.0
+
+        for _ in 0..<iters {
+            let networkOutput = self.n_layerOutput(X: X, weights: [new_weights])
+            let oneLayerDelta = self.outputDelta(A: networkOutput, Y: Y)
+
+            new_weights = self.updateWeights(A: self.addBias(X), delta: oneLayerDelta, weights: new_weights, rate: rate)
+
+            cost = self.costFunction(A: networkOutput, Y: Y)
+        }
+
+        print(cost)
+        return new_weights
+    }
+
+    func twoLayerTraining(data X: [[Double]], labels Y: [[Double]], weights0: [[[Double]]], weights1: [[[Double]]], iterations iters: Int, learningRate rate: Double) -> [[[Double]]] {
+
+        var new_weights_0 = weights0[0]
+        var new_weights_1 = weights1[0]
+
+        var cost = 0.0
+
+        for _ in 0..<iters {
+            let hiddenLayerOut = self.oneLayerOut(X: X, weights: new_weights_0)
+            let endLayerOutput = self.oneLayerOut(X: hiddenLayerOut, weights: new_weights_1)
+
+            let nextDelta = self.outputDelta(A: endLayerOutput, Y: Y)
+            let hiddenDelta = self.hiddenLayer_delta(A: self.addBias(hiddenLayerOut), nextDelta: nextDelta, weights: new_weights_1)
+
+            new_weights_0 = self.updateWeights(A: self.addBias(X), delta: hiddenDelta, weights: new_weights_0, rate: rate)
+            new_weights_1 = self.updateWeights(A: self.addBias(hiddenLayerOut), delta: nextDelta, weights: new_weights_1, rate: rate)
+
+            cost = self.costFunction(A: endLayerOutput, Y: Y)
+        }
+        return [new_weights_0, new_weights_1]
     }
 }
 
