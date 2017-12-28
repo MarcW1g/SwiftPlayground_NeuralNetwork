@@ -23,6 +23,83 @@ extension Array where Iterator.Element == Double {
 
         return product
     }
+
+    static func *(left: [Double], right: Double) -> [Double] {
+        var productArr: [Double] = []
+
+        for key in left {
+            productArr.append(right * key)
+        }
+
+        return productArr
+    }
+
+    static func -(left: [[Double]], right: [[Double]]) -> [[Double]] {
+        var newArray: [[Double]] = []
+
+        for (index, leftRow) in left.enumerated() {
+            var row: [Double] = []
+            for (item, leftItem) in leftRow.enumerated() {
+                row.append(leftItem - right[index][item])
+            }
+            newArray.append(row)
+        }
+
+        return newArray
+    }
+
+    static func -(left: [Double], right: [Double]) -> [Double] {
+        var newArray: [Double] = []
+
+        for (index, leftItem) in left.enumerated() {
+            newArray.append(leftItem - right[index])
+        }
+
+        return newArray
+    }
+
+    static func +(left: [Double], right: [Double]) -> [Double] {
+        var newArray: [Double] = []
+
+        for (index, leftItem) in left.enumerated() {
+            newArray.append(leftItem + right[index])
+        }
+
+        return newArray
+    }
+}
+
+
+class LinearAlgebra {
+    func dotProduct(left:[[Double]], right:[[Double]]) -> [[Double]] {
+        guard left[0].count ==  right.count else {
+            print("Dimensions are incorrect")
+            return [[]]
+        }
+
+        var dot: [[Double]] = []
+        for (_, left_row) in left.enumerated() {
+            var dotRow: [Double] = []
+            for i in 0..<right[0].count {
+                var newRow: [Double] = []
+                for row in right {
+                    newRow.append(row[i])
+                }
+                dotRow.append(left_row*newRow)
+            }
+            dot.append(dotRow)
+        }
+
+        return dot
+    }
+
+    func vectorTimes(left:[Double], right:[Double]) -> [Double] {
+        var returnArray: [Double] = []
+        for (i,l_item) in left.enumerated() {
+            returnArray.append(l_item * right[i])
+        }
+        return returnArray
+    }
 }
 
 class NeuralKit {
